@@ -176,10 +176,12 @@ class Tracker(object):
       A `Track`.
     """
     person = Person(
-        person.keypoints, person.bounding_box, person.score,
-        track_id if track_id else self._update_and_get_next_track_id())
-    track = Track(person, timestamp)
-    return track
+        person.keypoints,
+        person.bounding_box,
+        person.score,
+        track_id or self._update_and_get_next_track_id(),
+    )
+    return Track(person, timestamp)
 
   def _update_and_get_next_track_id(self):
     """Returns the next track ID."""

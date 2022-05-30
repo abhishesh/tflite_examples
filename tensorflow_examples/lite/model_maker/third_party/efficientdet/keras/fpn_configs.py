@@ -117,7 +117,7 @@ def qufpn_config(min_level, max_level, weight_method=None):
   node_ids[i].append(next(id_cnt))
   node_ids[min_level].append(node_ids[min_level][-1])
 
-  for i in range(min_level + 1, max_level + 1, 1):
+  for i in range(min_level + 1, max_level + 1):
     # bottom-up path 3.
     p.nodes.append({
         'feat_level': i,

@@ -49,7 +49,7 @@ def get_test_data_path(file_or_dirname):
     for f in subdirs + files:
       if f.endswith(file_or_dirname):
         return os.path.join(directory, f)
-  raise ValueError("No %s in test directory" % file_or_dirname)
+  raise ValueError(f"No {file_or_dirname} in test directory")
 
 
 def get_cache_dir(temp_dir, filename):
@@ -73,8 +73,7 @@ def test_in_tf_1(fn):
   @functools.wraps(fn)
   def decorator(*args, **kwargs):
     if compat.get_tf_behavior() != 1:
-      tf.compat.v1.logging.info("Skip function {} for test_in_tf_1".format(
-          fn.__name__))
+      tf.compat.v1.logging.info(f"Skip function {fn.__name__} for test_in_tf_1")
       return
     fn(*args, **kwargs)
 
@@ -87,8 +86,7 @@ def test_in_tf_2(fn):
   @functools.wraps(fn)
   def decorator(*args, **kwargs):
     if compat.get_tf_behavior() != 2:
-      tf.compat.v1.logging.info("Skip function {} for test_in_tf_2".format(
-          fn.__name__))
+      tf.compat.v1.logging.info(f"Skip function {fn.__name__} for test_in_tf_2")
       return
     fn(*args, **kwargs)
 
@@ -101,8 +99,7 @@ def test_in_tf_1and2(fn):
   @functools.wraps(fn)
   def decorator(*args, **kwargs):
     if compat.get_tf_behavior() not in [1, 2]:
-      tf.compat.v1.logging.info("Skip function {} for test_in_tf_1and2".format(
-          fn.__name__))
+      tf.compat.v1.logging.info(f"Skip function {fn.__name__} for test_in_tf_1and2")
       return
     fn(*args, **kwargs)
 
@@ -120,8 +117,7 @@ def build_model(input_shape, num_classes):
   else:
     raise ValueError("Model inputs should be 2D tensor or 4D tensor.")
 
-  model = tf.keras.Model(inputs=inputs, outputs=outputs)
-  return model
+  return tf.keras.Model(inputs=inputs, outputs=outputs)
 
 
 def get_dataloader(data_size, input_shape, num_classes, max_input_value=1000):
@@ -136,8 +132,7 @@ def get_dataloader(data_size, input_shape, num_classes, max_input_value=1000):
       shape=[data_size], minval=0, maxval=num_classes, dtype=tf.int32)
 
   ds = tf.data.Dataset.from_tensor_slices((features, labels))
-  data = dataloader.DataLoader(ds, data_size)
-  return data
+  return dataloader.DataLoader(ds, data_size)
 
 
 def create_pascal_voc(temp_dir=None):

@@ -84,17 +84,17 @@ class ArgMaxMatcher(matcher.Matcher):
     self._matched_threshold = matched_threshold
     if unmatched_threshold is None:
       self._unmatched_threshold = matched_threshold
+    elif unmatched_threshold > matched_threshold:
+      raise ValueError('unmatched_threshold needs to be smaller or equal'
+                       'to matched_threshold')
     else:
-      if unmatched_threshold > matched_threshold:
-        raise ValueError('unmatched_threshold needs to be smaller or equal'
-                         'to matched_threshold')
       self._unmatched_threshold = unmatched_threshold
-    if not negatives_lower_than_unmatched:
-      if self._unmatched_threshold == self._matched_threshold:
-        raise ValueError('When negatives are in between matched and '
-                         'unmatched thresholds, these cannot be of equal '
-                         'value. matched: %s, unmatched: %s',
-                         self._matched_threshold, self._unmatched_threshold)
+    if (not negatives_lower_than_unmatched
+        and self._unmatched_threshold == self._matched_threshold):
+      raise ValueError('When negatives are in between matched and '
+                       'unmatched thresholds, these cannot be of equal '
+                       'value. matched: %s, unmatched: %s',
+                       self._matched_threshold, self._unmatched_threshold)
     self._force_match_for_each_row = force_match_for_each_row
     self._negatives_lower_than_unmatched = negatives_lower_than_unmatched
 
@@ -156,22 +156,19 @@ class ArgMaxMatcher(matcher.Matcher):
                                                      between_thresholds,
                                                      -1)
 
-      if self._force_match_for_each_row:
-        similarity_matrix_shape = shape_utils.combined_static_and_dynamic_shape(
-            similarity_matrix)
-        force_match_column_ids = tf.argmax(similarity_matrix, 1,
-                                           output_type=tf.int32)
-        force_match_column_indicators = tf.one_hot(
-            force_match_column_ids, depth=similarity_matrix_shape[1])
-        force_match_row_ids = tf.argmax(force_match_column_indicators, 0,
-                                        output_type=tf.int32)
-        force_match_column_mask = tf.cast(
-            tf.reduce_max(force_match_column_indicators, 0), tf.bool)
-        final_matches = tf.where(force_match_column_mask,
-                                 force_match_row_ids, matches)
-        return final_matches
-      else:
+      if not self._force_match_for_each_row:
         return matches
+      similarity_matrix_shape = shape_utils.combined_static_and_dynamic_shape(
+          similarity_matrix)
+      force_match_column_ids = tf.argmax(similarity_matrix, 1,
+                                         output_type=tf.int32)
+      force_match_column_indicators = tf.one_hot(
+          force_match_column_ids, depth=similarity_matrix_shape[1])
+      force_match_row_ids = tf.argmax(force_match_column_indicators, 0,
+                                      output_type=tf.int32)
+      force_match_column_mask = tf.cast(
+          tf.reduce_max(force_match_column_indicators, 0), tf.bool)
+      return tf.where(force_match_column_mask, force_match_row_ids, matches)
 
     if similarity_matrix.shape.is_fully_defined():
       if similarity_matrix.shape[0] == 0:

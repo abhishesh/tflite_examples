@@ -112,7 +112,7 @@ def run(model: str, label: str, max_results: int, num_threads: int,
     for idx, category in enumerate(categories):
       class_name = category.label
       probability = round(category.score, 2)
-      result_text = class_name + ' (' + str(probability) + ')'
+      result_text = f'{class_name} ({str(probability)})'
       # Skip the first 2 lines occupied by the fps and time per inference.
       text_location = (_LEFT_MARGIN, (idx + 3) * _ROW_SIZE)
       cv2.putText(image, result_text, text_location, cv2.FONT_HERSHEY_PLAIN,

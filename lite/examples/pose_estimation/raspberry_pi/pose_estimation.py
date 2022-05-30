@@ -49,7 +49,7 @@ def run(estimation_model: str, tracker_type: str, classification_model: str,
         'MoveNet MultiPose model.')
 
   # Initialize the pose estimator selected.
-  if estimation_model in ['movenet_lightning', 'movenet_thunder']:
+  if estimation_model in {'movenet_lightning', 'movenet_thunder'}:
     pose_detector = Movenet(estimation_model)
   elif estimation_model == 'posenet':
     pose_detector = Posenet(estimation_model)
@@ -110,7 +110,7 @@ def run(estimation_model: str, tracker_type: str, classification_model: str,
       # Check if all keypoints are detected before running the classifier.
       # If there's a keypoint below the threshold, show an error.
       person = list_persons[0]
-      min_score = min([keypoint.score for keypoint in person.keypoints])
+      min_score = min(keypoint.score for keypoint in person.keypoints)
       if min_score < keypoint_detection_threshold_for_classifier:
         error_text = 'Some keypoints are not detected.'
         text_location = (left_margin, 2 * row_size)
@@ -128,7 +128,7 @@ def run(estimation_model: str, tracker_type: str, classification_model: str,
         for i in range(classification_results_to_show):
           class_name = prob_list[i].label
           probability = round(prob_list[i].score, 2)
-          result_text = class_name + ' (' + str(probability) + ')'
+          result_text = f'{class_name} ({str(probability)})'
           text_location = (left_margin, (i + 2) * row_size)
           cv2.putText(image, result_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                       font_size, text_color, font_thickness)
@@ -140,7 +140,7 @@ def run(estimation_model: str, tracker_type: str, classification_model: str,
       start_time = time.time()
 
     # Show the FPS
-    fps_text = 'FPS = ' + str(int(fps))
+    fps_text = f'FPS = {int(fps)}'
     text_location = (left_margin, row_size)
     cv2.putText(image, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                 font_size, text_color, font_thickness)

@@ -118,7 +118,7 @@ class ScannConverterTest(tf.test.TestCase, parameterized.TestCase):
     if distance == 'dot_product':
       self.assertEqual(converted_artifacts.ondevice_config.query_distance,
                        serialized_searcher_pb2.DOT_PRODUCT)
-    if distance == 'squared_l2':
+    elif distance == 'squared_l2':
       self.assertEqual(converted_artifacts.ondevice_config.query_distance,
                        serialized_searcher_pb2.SQUARED_L2_DISTANCE)
 
@@ -240,10 +240,7 @@ class ScannConverterTest(tf.test.TestCase, parameterized.TestCase):
         db_contents[b'E_2'],
         dtype=np.uint8 if hashed else np.float32).reshape((3, DIMENSIONS))
 
-    if hashed:
-      expected_dataset = hashed_dataset
-    else:
-      expected_dataset = float_dataset
+    expected_dataset = hashed_dataset if hashed else float_dataset
     np.testing.assert_array_equal(partition_2[0], expected_dataset[2])
     np.testing.assert_array_equal(partition_2[1], expected_dataset[5])
     np.testing.assert_array_equal(partition_2[2], expected_dataset[8])

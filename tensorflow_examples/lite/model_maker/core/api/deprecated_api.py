@@ -13,17 +13,8 @@
 # limitations under the License.
 """Deprecated APIs."""
 
-IMPORTS = {}
 
-# pylint: disable=line-too-long
-IMPORTS[''] = """
-# Deprecated imports are kept for backward compatiblity and to be removed in
-# future versions. Please refer to public APIs for replacement:
-# https://www.tensorflow.org/lite/api_docs/python/tflite_model_maker
-# pylint: disable=g-bad-import-order
-from tensorflow_examples.lite.model_maker.core.data_util.image_dataloader import ImageClassifierDataLoader
-from tensorflow_examples.lite.model_maker.core.export_format import ExportFormat
-from tensorflow_examples.lite.model_maker.core.task import configs
-# pylint: enable=g-bad-import-order
-"""
+IMPORTS = {
+    '': """\x1f# Deprecated imports are kept for backward compatiblity and to be removed in\x1f# future versions. Please refer to public APIs for replacement:\x1f# https://www.tensorflow.org/lite/api_docs/python/tflite_model_maker\x1f# pylint: disable=g-bad-import-order\x1ffrom tensorflow_examples.lite.model_maker.core.data_util.image_dataloader import ImageClassifierDataLoader\x1ffrom tensorflow_examples.lite.model_maker.core.export_format import ExportFormat\x1ffrom tensorflow_examples.lite.model_maker.core.task import configs\x1f# pylint: enable=g-bad-import-order\x1f"""
+}
 # pylint: enable=line-too-long

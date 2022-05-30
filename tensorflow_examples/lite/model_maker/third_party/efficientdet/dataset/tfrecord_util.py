@@ -71,8 +71,8 @@ def recursive_parse_xml_to_dict(xml):
   Returns:
     Python dictionary holding XML contents.
   """
-  if not len(xml):  # pylint: disable=g-explicit-length-test
-    return {xml.tag: xml.text if xml.text else ''}
+  if not len(xml):# pylint: disable=g-explicit-length-test
+    return {xml.tag: xml.text or ''}
   result = {}
   for child in xml:
     child_result = recursive_parse_xml_to_dict(child)
@@ -102,9 +102,7 @@ def open_sharded_output_tfrecords(exit_stack, base_path, num_shards):
       for idx in range(num_shards)
   ]
 
-  tfrecords = [
+  return [
       exit_stack.enter_context(tf.io.TFRecordWriter(file_name))
       for file_name in tf_record_output_filenames
   ]
-
-  return tfrecords

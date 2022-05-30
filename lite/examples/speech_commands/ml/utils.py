@@ -69,14 +69,12 @@ def tf_roll(a, shift, a_len=16000):
   # https://stackoverflow.com/questions/42651714/vector-shift-roll-in-tensorflow
   def roll_left(a, shift, a_len):
     shift %= a_len
-    rolled = tf.concat([a[a_len - shift:, :], a[:a_len - shift, :]], axis=0)
-    return rolled
+    return tf.concat([a[a_len - shift:, :], a[:a_len - shift, :]], axis=0)
 
   def roll_right(a, shift, a_len):
     shift = -shift
     shift %= a_len
-    rolled = tf.concat([a[shift:, :], a[:shift, :]], axis=0)
-    return rolled
+    return tf.concat([a[shift:, :], a[:shift, :]], axis=0)
 
   # https://stackoverflow.com/questions/35833011/how-to-add-if-condition-in-a-tensorflow-graph
   return tf.cond(

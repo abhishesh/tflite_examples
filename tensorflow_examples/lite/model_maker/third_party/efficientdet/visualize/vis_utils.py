@@ -496,9 +496,7 @@ def draw_bounding_boxes_on_image_tensors(images,
     if original_image_spatial_shape is not None:
       image_and_detections[2] = _resize_original_image(image, original_shape)
 
-    image_with_boxes = tf.py_func(visualize_boxes_fn, image_and_detections[2:],
-                                  tf.uint8)
-    return image_with_boxes
+    return tf.py_func(visualize_boxes_fn, image_and_detections[2:], tf.uint8)
 
   images = tf.map_fn(draw_boxes, elems, dtype=tf.uint8, back_prop=False)
   return images
@@ -542,7 +540,10 @@ def draw_side_by_side_evaluation_image(eval_dict,
   # Add the batch dimension if the eval_dict is for single example.
   if len(eval_dict[detection_fields.detection_classes].shape) == 1:
     for key in eval_dict:
-      if key != input_data_fields.original_image and key != input_data_fields.image_additional_channels:
+      if key not in [
+          input_data_fields.original_image,
+          input_data_fields.image_additional_channels,
+      ]:
         eval_dict[key] = tf.expand_dims(eval_dict[key], 0)
 
   for indx in range(eval_dict[input_data_fields.original_image].shape[0]):
@@ -708,8 +709,8 @@ def draw_keypoints_on_image(image,
   keypoints_x = [k[1] for k in keypoints]
   keypoints_y = [k[0] for k in keypoints]
   if use_normalized_coordinates:
-    keypoints_x = tuple([im_width * x for x in keypoints_x])
-    keypoints_y = tuple([im_height * y for y in keypoints_y])
+    keypoints_x = tuple(im_width * x for x in keypoints_x)
+    keypoints_y = tuple(im_height * y for y in keypoints_y)
   for keypoint_x, keypoint_y in zip(keypoints_x, keypoints_y):
     draw.ellipse([(keypoint_x - radius, keypoint_y - radius),
                   (keypoint_x + radius, keypoint_y + radius)],
@@ -856,23 +857,16 @@ def visualize_boxes_and_labels_on_image_array(
         box_to_color_map[box] = groundtruth_box_visualization_color
       else:
         display_str = ''
-        if not skip_labels:
-          if not agnostic_mode:
-            if classes[i] in six.viewkeys(category_index):
-              class_name = category_index[classes[i]]['name']
-            else:
-              class_name = 'N/A'
-            display_str = str(class_name)
+        if not skip_labels and not agnostic_mode:
+          class_name = (category_index[classes[i]]['name'] if
+                        classes[i] in six.viewkeys(category_index) else 'N/A')
+          display_str = str(class_name)
         if not skip_scores:
-          if not display_str:
-            display_str = '{}%'.format(int(100 * scores[i]))
-          else:
-            display_str = '{}: {}%'.format(display_str, int(100 * scores[i]))
+          display_str = (f'{display_str}: {int(100 * scores[i])}%'
+                         if display_str else f'{int(100 * scores[i])}%')
         if not skip_track_ids and track_ids is not None:
-          if not display_str:
-            display_str = 'ID {}'.format(track_ids[i])
-          else:
-            display_str = '{}: ID {}'.format(display_str, track_ids[i])
+          display_str = (f'{display_str}: ID {track_ids[i]}'
+                         if display_str else f'ID {track_ids[i]}')
         box_to_display_str_map[box].append(display_str)
         if agnostic_mode:
           box_to_color_map[box] = 'DarkOrange'
@@ -945,10 +939,9 @@ def add_cdf_image_summary(values, name):
     ax.set_xlabel('fraction of examples')
     fig.canvas.draw()
     width, height = fig.get_size_inches() * fig.get_dpi()
-    image = np.frombuffer(
-        fig.canvas.tostring_rgb(),
-        dtype='uint8').reshape(1, int(height), int(width), 3)
-    return image
+    return np.frombuffer(
+        fig.canvas.tostring_rgb(), dtype='uint8').reshape(
+            1, int(height), int(width), 3)
 
   cdf_plot = tf.py_func(cdf_plot, [values], tf.uint8)
   tf.summary.image(name, cdf_plot)
@@ -976,10 +969,9 @@ def add_hist_image_summary(values, bins, name):
     ax.set_xlabel('value')
     fig.canvas.draw()
     width, height = fig.get_size_inches() * fig.get_dpi()
-    image = np.frombuffer(
-        fig.canvas.tostring_rgb(),
-        dtype='uint8').reshape(1, int(height), int(width), 3)
-    return image
+    return np.frombuffer(
+        fig.canvas.tostring_rgb(), dtype='uint8').reshape(
+            1, int(height), int(width), 3)
 
   hist_plot = tf.py_func(hist_plot, [values, bins], tf.uint8)
   tf.summary.image(name, hist_plot)
