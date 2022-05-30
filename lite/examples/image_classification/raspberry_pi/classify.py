@@ -90,7 +90,7 @@ def run(model: str, max_results: int, score_threshold: float, num_threads: int,
     for idx, category in enumerate(categories.classifications[0].classes):
       class_name = category.class_name
       score = round(category.score, 2)
-      result_text = class_name + ' (' + str(score) + ')'
+      result_text = f'{class_name} ({str(score)})'
       text_location = (_LEFT_MARGIN, (idx + 2) * _ROW_SIZE)
       cv2.putText(image, result_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                   _FONT_SIZE, _TEXT_COLOR, _FONT_THICKNESS)
@@ -102,7 +102,7 @@ def run(model: str, max_results: int, score_threshold: float, num_threads: int,
       start_time = time.time()
 
     # Show the FPS
-    fps_text = 'FPS = ' + str(int(fps))
+    fps_text = f'FPS = {int(fps)}'
     text_location = (_LEFT_MARGIN, _ROW_SIZE)
     cv2.putText(image, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
                 _FONT_SIZE, _TEXT_COLOR, _FONT_THICKNESS)

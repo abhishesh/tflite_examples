@@ -214,7 +214,7 @@ def nms(dets, nms_configs):
   if method in ('linear', 'gaussian'):
     return soft_nms(dets, nms_configs)
 
-  raise ValueError('Unknown NMS method: {}'.format(method))
+  raise ValueError(f'Unknown NMS method: {method}')
 
 
 def per_class_nms(boxes, scores, classes, image_id, image_scale, num_classes,

@@ -62,11 +62,11 @@ class MetadataLoader(object):
     """
 
     def _load_metadata(path, mode="r"):
-      if mode != "r" and mode != "rb":
+      if mode not in ["r", "rb"]:
         raise ValueError(
             "`mode` must be \"r\" or \"rb\" to read text or binary metadata.")
 
-      metadata_file_path = os.path.splitext(path)[0] + ".dat"
+      metadata_file_path = f"{os.path.splitext(path)[0]}.dat"
       with open(metadata_file_path, mode) as f:
         return f.read()
 

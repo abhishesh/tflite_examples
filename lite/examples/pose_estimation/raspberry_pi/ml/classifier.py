@@ -66,7 +66,7 @@ class Classifier(object):
       An array contains the list of labels.
     """
     with open(label_path, 'r') as f:
-      return [line.strip() for _, line in enumerate(f.readlines())]
+      return [line.strip() for line in f.readlines()]
 
   def classify_pose(self, person: Person) -> List[Category]:
     """Run classification on an input.
@@ -98,9 +98,7 @@ class Classifier(object):
     # Sort output by probability descending.
     prob_descending = sorted(
         range(len(output)), key=lambda k: output[k], reverse=True)
-    prob_list = [
+    return [
         Category(label=self.pose_class_names[idx], score=output[idx])
         for idx in prob_descending
     ]
-
-    return prob_list

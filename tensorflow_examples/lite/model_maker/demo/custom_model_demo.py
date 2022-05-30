@@ -126,13 +126,12 @@ class Spec(BinaryClassificationBaseSpec):
     model.compile(
         optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
 
-    hist = model.fit(
+    return model.fit(
         train_ds,
         steps_per_epoch=train_steps,
         validation_data=validation_ds,
         epochs=epochs,
         **kwargs)
-    return hist
 
 
 class BinaryClassifier(custom_model.CustomModel):
@@ -174,8 +173,8 @@ class BinaryClassifier(custom_model.CustomModel):
     predictions, labels = [], []
 
     lite_runner = model_util.get_lite_runner(tflite_filepath, self.model_spec)
+    log_steps = 1000
     for i, (feature, label) in enumerate(data_util.generate_elements(ds)):
-      log_steps = 1000
       tf.compat.v1.logging.log_every_n(tf.compat.v1.logging.INFO,
                                        'Processing example: #%d\n%s', log_steps,
                                        i, feature)

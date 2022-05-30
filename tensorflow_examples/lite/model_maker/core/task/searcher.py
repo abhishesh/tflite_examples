@@ -296,20 +296,18 @@ class Searcher(object):
       model = _schema_fb.Model.GetRootAsModel(model_buffer, 0)
       num_input_tensors = model.Subgraphs(0).InputsLength()
 
-      # Extracts the metadata.
-      metadata_buffer = _metadata.get_metadata_buffer(model_buffer)
-      if metadata_buffer:
+      if metadata_buffer := _metadata.get_metadata_buffer(model_buffer):
         metadata = _metadata_fb.ModelMetadataT.InitFromObj(
             _metadata_fb.ModelMetadata.GetRootAsModelMetadata(
                 metadata_buffer, 0))
       else:
         # Creates the empty metadata.
         input_metadata = [
-            _metadata_fb.TensorMetadataT() for i in range(num_input_tensors)
+            _metadata_fb.TensorMetadataT() for _ in range(num_input_tensors)
         ]
         num_output_tensors = model.Subgraphs(0).OutputsLength()
         output_metadata = [
-            _metadata_fb.TensorMetadataT() for i in range(num_output_tensors)
+            _metadata_fb.TensorMetadataT() for _ in range(num_output_tensors)
         ]
 
         subgraph_metadata = _metadata_fb.SubGraphMetadataT()

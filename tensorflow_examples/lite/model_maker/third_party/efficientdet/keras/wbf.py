@@ -31,9 +31,7 @@ def vectorized_iou(clusters, detection):
   boxa_area = (x12 - x11) * (y12 - y11)
   boxb_area = (x22 - x21) * (y22 - y21)
 
-  iou = inter_area / (boxa_area + boxb_area - inter_area)
-
-  return iou
+  return inter_area / (boxa_area + boxb_area - inter_area)
 
 
 def find_matching_cluster(clusters, detection):

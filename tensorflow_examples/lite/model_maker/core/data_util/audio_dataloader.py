@@ -125,8 +125,7 @@ class ExamplesHelper(object):
     examples, labels = self.examples_and_label_indices()
     wav_ds = tf.data.Dataset.from_tensor_slices(list(examples))
     label_ds = tf.data.Dataset.from_tensor_slices(list(labels))
-    ds = tf.data.Dataset.zip((wav_ds, label_ds))
-    return ds
+    return tf.data.Dataset.zip((wav_ds, label_ds))
 
 
 @mm_export('audio_classifier.DataLoader')

@@ -62,8 +62,8 @@ def _get_cache_filenames(cache_dir, model_spec, data_name, is_training):
   hasher.update(str(model_spec.get_config()).encode('utf-8'))
   hasher.update(str(is_training).encode('utf-8'))
   cache_prefix = os.path.join(cache_dir, hasher.hexdigest())
-  cache_tfrecord_file = cache_prefix + '.tfrecord'
-  cache_meta_data_file = cache_prefix + '_meta_data'
+  cache_tfrecord_file = f'{cache_prefix}.tfrecord'
+  cache_meta_data_file = f'{cache_prefix}_meta_data'
 
   return cache_tfrecord_file, cache_meta_data_file, cache_prefix
 
@@ -126,10 +126,9 @@ class TextClassifierDataLoader(dataloader.ClassificationDataLoader):
       all_text_paths = []
       for class_label in class_labels:
         all_text_paths.extend(
-            list(
-                tf.io.gfile.glob(os.path.join(data_root, class_label) + r'/*')))
+            list(tf.io.gfile.glob(f'{os.path.join(data_root, class_label)}/*')))
     else:
-      all_text_paths = list(tf.io.gfile.glob(data_root + r'/*/*'))
+      all_text_paths = list(tf.io.gfile.glob(f'{data_root}/*/*'))
 
     all_text_size = len(all_text_paths)
     if all_text_size == 0:
@@ -212,9 +211,7 @@ class TextClassifierDataLoader(dataloader.ClassificationDataLoader):
       label_names = model_spec.index_to_label
       label_set = set(label_names)
     else:
-      label_set = set()
-      for line in lines:
-        label_set.add(line[label_column])
+      label_set = {line[label_column] for line in lines}
       label_names = sorted(label_set)
       model_spec.index_to_label = label_names
 
@@ -270,7 +267,7 @@ class TextClassifierDataLoader(dataloader.ClassificationDataLoader):
     is_cached, tfrecord_file, meta_data_file, file_prefix = _get_cache_info(
         cache_dir, data_name, model_spec, is_training)
 
-    vocab_file = file_prefix + '_vocab'
+    vocab_file = f'{file_prefix}_vocab'
     if is_cached:
       if model_spec.need_gen_vocab and is_training:
         model_spec.load_vocab(vocab_file)
@@ -283,10 +280,7 @@ class TextClassifierDataLoader(dataloader.ClassificationDataLoader):
     with tf.io.gfile.GFile(input_file, 'r') as f:
       reader = csv.DictReader(
           f, fieldnames=fieldnames, delimiter=delimiter, quotechar=quotechar)
-      lines = []
-      for line in reader:
-        lines.append(line)
-      return lines
+      return list(reader)
 
 
 @mm_export('question_answer.DataLoader')

@@ -128,7 +128,7 @@ def learning_rate_schedule(params, global_step):
   if lr_decay_method == 'constant':
     return params['adjusted_learning_rate']
 
-  raise ValueError('unknown lr_decay_method: {}'.format(lr_decay_method))
+  raise ValueError(f'unknown lr_decay_method: {lr_decay_method}')
 
 
 def focal_loss(y_pred, y_true, alpha, gamma, normalizer, label_smoothing=0.0):
@@ -487,7 +487,7 @@ def _model_fn(features, labels, mode, params, model, variable_filter_fn=None):
           'cls_loss': cls_loss,
           'box_loss': box_loss,
       }
-      output_metrics.update(coco_metrics)
+      output_metrics |= coco_metrics
       return output_metrics
 
     cls_loss_repeat = tf.reshape(
@@ -624,7 +624,7 @@ def get_model_arch(model_name='efficientdet-d0'):
   if 'efficientdet' in model_name:
     return efficientdet_arch.efficientdet
 
-  raise ValueError('Invalide model name {}'.format(model_name))
+  raise ValueError(f'Invalide model name {model_name}')
 
 
 def get_model_fn(model_name='efficientdet-d0'):
@@ -632,4 +632,4 @@ def get_model_fn(model_name='efficientdet-d0'):
   if 'efficientdet' in model_name:
     return efficientdet_model_fn
 
-  raise ValueError('Invalide model name {}'.format(model_name))
+  raise ValueError(f'Invalide model name {model_name}')

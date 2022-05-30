@@ -43,8 +43,8 @@ class ImageSearcherDataloaderTest(parameterized.TestCase, tf.test.TestCase):
     self.assertEqual(data_loader.dataset.shape, (3, 1280))
     self.assertAlmostEqual(data_loader.dataset[0][0], expected_value, places=6)
     # The order of file may be different.
-    self.assertEqual(set(data_loader.metadata),
-                     set(["burger", "sparrow", "cats_and_dogs"]))
+    self.assertEqual(
+        set(data_loader.metadata), {"burger", "sparrow", "cats_and_dogs"})
 
 
 if __name__ == "__main__":

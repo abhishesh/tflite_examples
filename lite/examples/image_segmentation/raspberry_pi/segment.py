@@ -149,7 +149,7 @@ def visualize(
     sys.exit(f'ERROR: Unsupported display mode: {display_mode}.')
 
   # Show the FPS
-  fps_text = 'FPS = ' + str(int(fps))
+  fps_text = f'FPS = {int(fps)}'
   text_location = (_FPS_LEFT_MARGIN, _LEGEND_ROW_SIZE)
   cv2.putText(overlay, fps_text, text_location, cv2.FONT_HERSHEY_PLAIN,
               _LEGEND_FONT_SIZE, _LEGEND_TEXT_COLOR, _LEGEND_FONT_THICKNESS)

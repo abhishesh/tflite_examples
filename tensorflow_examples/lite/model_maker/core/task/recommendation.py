@@ -58,8 +58,7 @@ class Recommendation(custom_model.CustomModel):
       gradient_clip_norm: float, clip threshold (<= 0 meaning no clip).
     """
     if not isinstance(model_spec, recommendation_spec.RecommendationSpec):
-      raise ValueError(
-          'Expect RecommendationSpec but got model_spec: {}'.format(model_spec))
+      raise ValueError(f'Expect RecommendationSpec but got model_spec: {model_spec}')
     self._model_dir = model_dir
     self._learning_rate = learning_rate
     self._gradient_clip_norm = gradient_clip_norm
@@ -105,7 +104,7 @@ class Recommendation(custom_model.CustomModel):
     Returns:
       History from model.fit().
     """
-    batch_size = batch_size if batch_size else self.model_spec.batch_size
+    batch_size = batch_size or self.model_spec.batch_size
 
     train_ds = train_data.gen_dataset(
         batch_size, is_training=True, shuffle=self.shuffle)
@@ -134,7 +133,7 @@ class Recommendation(custom_model.CustomModel):
     Returns:
       History from model.evaluate().
     """
-    batch_size = batch_size if batch_size else self.model_spec.batch_size
+    batch_size = batch_size or self.model_spec.batch_size
     eval_ds = data.gen_dataset(batch_size, is_training=False)
     history = self.model.evaluate(eval_ds)
     tf.get_logger().info(history)
@@ -207,8 +206,7 @@ class Recommendation(custom_model.CustomModel):
       # Update metrics.
       for m in metrics:
         m.update_state(y_true, y_pred)
-    result = collections.OrderedDict([(m.name, m.result()) for m in metrics])
-    return result
+    return collections.OrderedDict([(m.name, m.result()) for m in metrics])
 
   @classmethod
   def create(cls,

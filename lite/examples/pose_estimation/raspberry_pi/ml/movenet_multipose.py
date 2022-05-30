@@ -164,15 +164,13 @@ class MoveNetMultiPose(object):
       scores = keypoints_with_scores[0, idx, range(2, 51, 3)]
 
       # Create the list of keypoints
-      keypoints = []
-      for i in range(scores.shape[0]):
-        keypoints.append(
-            KeyPoint(
-                BodyPart(i),
-                Point(
-                    int(kpts_x[i] * image_width),
-                    int(kpts_y[i] * image_height)), scores[i]))
-
+      keypoints = [
+          KeyPoint(
+              BodyPart(i),
+              Point(int(kpts_x[i] * image_width), int(kpts_y[i] * image_height)),
+              scores[i],
+          ) for i in range(scores.shape[0])
+      ]
       # Calculate the bounding box
       rect = [
           keypoints_with_scores[0, idx, 51], keypoints_with_scores[0, idx, 52],

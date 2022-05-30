@@ -52,9 +52,8 @@ class ImageClassifierTest(tf.test.TestCase):
     ds = tf.data.Dataset.from_generator(
         self._gen, (tf.uint8, tf.int64), (tf.TensorShape(
             [self.IMAGE_SIZE, self.IMAGE_SIZE, 3]), tf.TensorShape([])))
-    data = image_dataloader.ImageClassifierDataLoader(
+    return image_dataloader.ImageClassifierDataLoader(
         ds, self.IMAGES_PER_CLASS * 3, ['cyan', 'magenta', 'yellow'])
-    return data
 
   def setUp(self):
     super(ImageClassifierTest, self).setUp()
@@ -190,17 +189,17 @@ class ImageClassifierTest(tf.test.TestCase):
                                            model,
                                            expected_json_file=None):
     model_name = 'model_with_metadata'
-    tflite_output_file = os.path.join(self.get_temp_dir(),
-                                      '%s.tflite' % model_name)
-    json_output_file = os.path.join(self.get_temp_dir(), '%s.json' % model_name)
+    tflite_output_file = os.path.join(self.get_temp_dir(), f'{model_name}.tflite')
+    json_output_file = os.path.join(self.get_temp_dir(), f'{model_name}.json')
     labels_output_file = os.path.join(self.get_temp_dir(), 'labels.txt')
 
     model.export(
         self.get_temp_dir(),
-        '%s.tflite' % model_name,
+        f'{model_name}.tflite',
         quantization_config=None,
         with_metadata=True,
-        export_metadata_json_file=True)
+        export_metadata_json_file=True,
+    )
 
     self.assertTrue(os.path.isfile(tflite_output_file))
     self.assertGreater(os.path.getsize(tflite_output_file), 0)

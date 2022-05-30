@@ -143,8 +143,7 @@ def batch_decode(encoded_boxes, box_coder, anchors):
                      (encoded_boxes.get_shape()[1].value,
                       anchors.num_boxes_static()))
 
-  decoded_boxes = tf.stack([
+  return tf.stack([
       box_coder.decode(boxes, anchors).get()
       for boxes in tf.unstack(encoded_boxes)
   ])
-  return decoded_boxes

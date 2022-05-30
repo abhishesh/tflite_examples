@@ -327,12 +327,12 @@ class ServingDriver:
         # pre_ & post_ modes.
         export_model = ExportModel(
             self.model, pre_mode=None, post_mode='tflite')
-      return export_model, spec
     else:
       spec = tf.TensorSpec(
           shape=[self.batch_size, None, None, 3], dtype=tf.uint8, name='images')
       export_model = ExportModel(self.model)
-      return export_model, spec
+
+    return export_model, spec
 
   def export(self,
              output_dir: Optional[Text] = None,

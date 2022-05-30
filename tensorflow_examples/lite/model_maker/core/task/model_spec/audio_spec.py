@@ -85,19 +85,19 @@ class MetadataWriter:
       return self.add_output(name, labels, **kwargs)
 
     label_files = []
-    if isinstance(labels, collections.OrderedDict):
-      for locale, label_list in labels.items():
-        full_path = os.path.join(
-            self._temp_folder.name,
-            '{}_labels{}.txt'.format(name, '_' + locale if locale else ''))
-        model_util.export_labels(full_path, label_list)
-        label_files.append(
-            md_info.LabelFileMd(file_path=full_path, locale=locale))
-    else:
+    if not isinstance(labels, collections.OrderedDict):
       raise ValueError(
-          '`labels` should be either a list of labels or an ordered dict mapping `locale` -> list of labels. got: {}'
-          .format(labels))
+          f'`labels` should be either a list of labels or an ordered dict mapping `locale` -> list of labels. got: {labels}'
+      )
 
+    for locale, label_list in labels.items():
+      full_path = os.path.join(
+          self._temp_folder.name,
+          f"{name}_labels{f'_{locale}' if locale else ''}.txt",
+      )
+      model_util.export_labels(full_path, label_list)
+      label_files.append(
+          md_info.LabelFileMd(file_path=full_path, locale=locale))
     idx = len(self._outputs)
     self._outputs.append(
         md_info.ClassificationTensorMd(
@@ -109,8 +109,7 @@ class MetadataWriter:
   def save(self, tflite_filepath=None, json_filepath=None):
     """Persist model with metadata."""
     if len(self._inputs) > 1:
-      raise ValueError('Only supports single input, got {}'.format(
-          len(self._inputs)))
+      raise ValueError(f'Only supports single input, got {len(self._inputs)}')
     input_md = self._inputs[0]
 
     writer = md_writer.MetadataWriter.create_from_metadata_info_for_multihead(
@@ -327,9 +326,8 @@ class BrowserFFTSpec(BaseSpec):
     model.compile(
         optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 
-    hist = model.fit(
+    return model.fit(
         train_ds, validation_data=validation_ds, epochs=epochs, **kwargs)
-    return hist
 
   def create_serving_model(self, training_model):
     """Create a model for serving."""
@@ -400,12 +398,12 @@ class BrowserFFTSpec(BaseSpec):
     model_util.set_batch_size(model, batch_size=None)
 
     if with_metadata:
-      if not ENABLE_METADATA:
-        print('Writing Metadata is not support in the installed tflite-support '
-              'version. Please use tflite-support >= 0.2.*')
-      else:
+      if ENABLE_METADATA:
         self._export_metadata(tflite_filepath, index_to_label,
                               export_metadata_json_file)
+      else:
+        print('Writing Metadata is not support in the installed tflite-support '
+              'version. Please use tflite-support >= 0.2.*')
 
 
 @mm_export('audio_classifier.YamNetSpec')
@@ -474,23 +472,22 @@ class YAMNetSpec(BaseSpec):
     return self._SAMPLE_RATE
 
   def create_model(self, num_classes, train_whole_model=False):
-    model = tf.keras.Sequential([
+    return tf.keras.Sequential([
         tf.keras.layers.InputLayer(
             input_shape=(YAMNetSpec.EMBEDDING_SIZE),
             dtype=tf.float32,
-            name='embedding'),
+            name='embedding',
+        ),
         tf.keras.layers.Dense(
-            num_classes, name='classification_head', activation='softmax')
+            num_classes, name='classification_head', activation='softmax'),
     ])
-    return model
 
   def run_classifier(self, model, epochs, train_ds, validation_ds, **kwargs):
     model.compile(
         optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 
-    hist = model.fit(
+    return model.fit(
         train_ds, validation_data=validation_ds, epochs=epochs, **kwargs)
-    return hist
 
   # Annotate the TF function with input_signature to avoid re-tracing. Otherwise
   # the TF function gets retraced everytime the input shape is changed.
@@ -594,12 +591,9 @@ class YAMNetSpec(BaseSpec):
     scores, embeddings, _ = embedding_extraction_layer(reshaped_input)
     serving_outputs = training_model(embeddings)
 
-    if self._keep_yamnet_and_custom_heads:
-      serving_model = tf.keras.Model(keras_input, [scores, serving_outputs])
-    else:
-      serving_model = tf.keras.Model(keras_input, serving_outputs)
-
-    return serving_model
+    return (tf.keras.Model(keras_input, [scores, serving_outputs])
+            if self._keep_yamnet_and_custom_heads else tf.keras.Model(
+                keras_input, serving_outputs))
 
   def export_tflite(self,
                     model,
@@ -633,9 +627,9 @@ class YAMNetSpec(BaseSpec):
         serving_model, tflite_filepath, quantization_config=quantization_config)
 
     if with_metadata:
-      if not ENABLE_METADATA:
-        print('Writing Metadata is not support in the current tflite-support '
-              'version. Please use tflite-support >= 0.2.*')
-      else:
+      if ENABLE_METADATA:
         self._export_metadata(tflite_filepath, index_to_label,
                               export_metadata_json_file)
+      else:
+        print('Writing Metadata is not support in the current tflite-support '
+              'version. Please use tflite-support >= 0.2.*')
